@@ -439,6 +439,7 @@
                     <table id="stats-table">
                         <thead>
                             <tr>
+                                <th>Pos.</th>
                                 <th>Jugador</th>
                                 <th>Partidos Jugados</th>
                                 <th>Victorias</th>
@@ -474,6 +475,7 @@
                     <table id="titles-table">
                         <thead>
                             <tr>
+                                <th>Pos.</th>
                                 <th>Jugador</th>
                                 <th>🏆 Títulos de Oro</th>
                                 <th>🥈 Títulos de Plata</th>
@@ -521,28 +523,30 @@
     </div>
 
     <script>
-        // Player data with colors
-        const players = [
-            { name: 'Juan', color: '#E3F2FD' },
-            { name: 'Fede', color: '#F3E5F5' },
-            { name: 'Lau', color: '#E0F2F1' },
-            { name: 'Inda', color: '#FFF3E0' },
-            { name: 'Jesu', color: '#FCE4EC' },
-            { name: 'Tio', color: '#E8F5E9' },
-            { name: 'Cami', color: '#FFE0B2' },
-            { name: 'Marcos', color: '#EDE7F6' },
-            { name: 'Joaco', color: '#E0F7FA' }
-        ];
+        // FIXED: Players array now contains only strings (no objects)
+        const players = ['Juan', 'Fede', 'Lau', 'Inda', 'Jesu', 'Tio', 'Cami', 'Marcos', 'Joaco'];
+        
+        // Separate color mapping for styling
+        const playerColors = {
+            'Juan': '#E3F2FD',
+            'Fede': '#F3E5F5',
+            'Lau': '#E0F2F1',
+            'Inda': '#FFF3E0',
+            'Jesu': '#FCE4EC',
+            'Tio': '#E8F5E9',
+            'Cami': '#FFE0B2',
+            'Marcos': '#EDE7F6',
+            'Joaco': '#E0F7FA'
+        };
         
         // Helper function to get player color
         function getPlayerColor(playerName) {
-            const player = players.find(p => p.name === playerName);
-            return player ? player.color : '#ffffff';
+            return playerColors[playerName] || '#ffffff';
         }
         
         // Helper function to get player names array
         function getPlayerNames() {
-            return players.map(p => p.name);
+            return players; // Now players is already an array of strings
         }
         
         // Match storage
@@ -554,7 +558,7 @@
         
         // Initialize titles for all players
         function initializePlayerTitles() {
-            getPlayerNames().forEach(playerName => {
+            players.forEach(playerName => {
                 if (!playerTitles[playerName]) {
                     playerTitles[playerName] = {
                         gold: 0,
@@ -571,22 +575,28 @@
             updateAllTables();
         }
 
-        // Populate player dropdowns
+        // Populate player dropdowns - FIXED to use string values
         function populatePlayerDropdowns() {
             const player1Select = document.getElementById('player1');
             const player2Select = document.getElementById('player2');
             
-            players.forEach(player => {
+            console.log('DEBUG: Players array:', players); // Debug log to verify strings
+            
+            players.forEach(playerName => {
+                console.log('DEBUG: Adding player to dropdown:', playerName, typeof playerName); // Debug log
+                
                 const option1 = document.createElement('option');
-                option1.value = player.name;
-                option1.textContent = player.name;
+                option1.value = playerName; // Now playerName is a string directly
+                option1.textContent = playerName; // Now playerName is a string directly
                 player1Select.appendChild(option1);
                 
                 const option2 = document.createElement('option');
-                option2.value = player.name;
-                option2.textContent = player.name;
+                option2.value = playerName; // Now playerName is a string directly
+                option2.textContent = playerName; // Now playerName is a string directly
                 player2Select.appendChild(option2);
             });
+            
+            console.log('DEBUG: Dropdowns populated successfully');
         }
 
         // Handle form submission
@@ -614,15 +624,19 @@
                 return;
             }
             
-            // Add match
+            // Add match - DEBUG: Verify player values are strings
+            console.log('DEBUG: Form values - Player1:', player1, typeof player1, 'Player2:', player2, typeof player2);
+            
             const match = {
                 id: nextMatchId++,
-                player1: player1,
+                player1: player1, // Should be string
                 player1Goals: player1Goals,
-                player2: player2,
+                player2: player2, // Should be string
                 player2Goals: player2Goals,
                 timestamp: new Date()
             };
+            
+            console.log('DEBUG: Created match object:', match);
             
             matches.unshift(match); // Add to beginning for chronological order
             
@@ -722,7 +736,7 @@
             const tbody = document.getElementById('stats-tbody');
             tbody.innerHTML = '';
             
-            const playerStats = getPlayerNames().map(playerName => ({
+            const playerStats = players.map(playerName => ({
                 name: playerName,
                 color: getPlayerColor(playerName),
                 ...calculatePlayerStats(playerName)
@@ -734,16 +748,33 @@
                 return b.goalDifference - a.goalDifference;
             });
             
-            playerStats.forEach(player => {
+            playerStats.forEach((player, index) => {
                 const row = document.createElement('tr');
+                const position = index + 1;
                 
                 const goalDiffClass = player.goalDifference > 0 ? 'stats-positive' : 
                                      player.goalDifference < 0 ? 'stats-negative' : '';
                 
-                // Apply player color to the row
-                row.style.backgroundColor = player.color;
+                // Apply ranking colors
+                if (position === 1) {
+                    row.style.backgroundColor = '#FFD700';
+                    row.style.color = '#000000';
+                } else if (position === 2) {
+                    row.style.backgroundColor = '#C0C0C0';
+                    row.style.color = '#000000';
+                } else if (position === 3) {
+                    row.style.backgroundColor = '#CD7F32';
+                    row.style.color = '#FFFFFF';
+                } else if (position >= 8) {
+                    row.style.backgroundColor = '#F8D7DA';
+                    row.style.color = '#721c24';
+                } else {
+                    // Keep default alternating colors for positions 4-7
+                    row.style.backgroundColor = player.color;
+                }
                 
                 row.innerHTML = `
+                    <td style="text-align: center;"><strong>${position}</strong></td>
                     <td><strong>${player.name}</strong></td>
                     <td>${player.matchesPlayed}</td>
                     <td>${player.wins}</td>
@@ -793,20 +824,20 @@
             // Create header row
             const headerRow = document.createElement('tr');
             headerRow.innerHTML = '<th></th>';
-            getPlayerNames().forEach(playerName => {
+            players.forEach(playerName => {
                 headerRow.innerHTML += `<th>${playerName}</th>`;
             });
             table.appendChild(headerRow);
             
             // Create data rows
-            getPlayerNames().forEach(rowPlayer => {
+            players.forEach(rowPlayer => {
                 const row = document.createElement('tr');
                 const headerCell = document.createElement('th');
                 headerCell.textContent = rowPlayer;
                 headerCell.style.backgroundColor = getPlayerColor(rowPlayer);
                 row.appendChild(headerCell);
                 
-                getPlayerNames().forEach(colPlayer => {
+                players.forEach(colPlayer => {
                     const cell = document.createElement('td');
                     
                     if (rowPlayer === colPlayer) {
@@ -908,7 +939,7 @@
             tbody.innerHTML = '';
             
             // Get all players with their titles and calculate both total count and weighted points
-            const playersWithTitles = getPlayerNames().map(playerName => {
+            const playersWithTitles = players.map(playerName => {
                 const gold = playerTitles[playerName]?.gold || 0;
                 const silver = playerTitles[playerName]?.silver || 0;
                 const totalCount = gold + silver; // Simple count for display
@@ -931,11 +962,30 @@
                 return b.silver - a.silver;
             });
             
-            playersWithTitles.forEach(player => {
+            playersWithTitles.forEach((player, index) => {
                 const row = document.createElement('tr');
-                row.style.backgroundColor = player.color;
+                const position = index + 1;
+                
+                // Apply ranking colors
+                if (position === 1) {
+                    row.style.backgroundColor = '#FFD700';
+                    row.style.color = '#000000';
+                } else if (position === 2) {
+                    row.style.backgroundColor = '#C0C0C0';
+                    row.style.color = '#000000';
+                } else if (position === 3) {
+                    row.style.backgroundColor = '#CD7F32';
+                    row.style.color = '#FFFFFF';
+                } else if (position >= 8) {
+                    row.style.backgroundColor = '#F8D7DA';
+                    row.style.color = '#721c24';
+                } else {
+                    // Keep default alternating colors for positions 4-7
+                    row.style.backgroundColor = player.color;
+                }
                 
                 row.innerHTML = `
+                    <td style="text-align: center;"><strong>${position}</strong></td>
                     <td><strong>${player.name}</strong></td>
                     <td>
                         <div class="title-controls">
@@ -991,7 +1041,7 @@
                     matches = [];
                     nextMatchId = 1;
                     // Reset all titles to 0
-                    getPlayerNames().forEach(playerName => {
+                    players.forEach(playerName => {
                         playerTitles[playerName] = { gold: 0, silver: 0 };
                     });
                     updateAllTables();
