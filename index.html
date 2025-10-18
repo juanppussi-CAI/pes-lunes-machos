@@ -477,7 +477,7 @@
                             <tr>
                                 <th>Pos.</th>
                                 <th>Jugador</th>
-                                <th>🏆 Títulos de Oro</th>
+                                <th>🥇 Títulos de Oro</th>
                                 <th>🥈 Títulos de Plata</th>
                                 <th>📊 Total</th>
                             </tr>
@@ -526,22 +526,12 @@
         // FIXED: Players array now contains only strings (no objects)
         const players = ['Juan', 'Fede', 'Lau', 'Inda', 'Jesu', 'Tio', 'Cami', 'Marcos', 'Joaco'];
         
-        // Separate color mapping for styling
-        const playerColors = {
-            'Juan': '#E3F2FD',
-            'Fede': '#F3E5F5',
-            'Lau': '#E0F2F1',
-            'Inda': '#FFF3E0',
-            'Jesu': '#FCE4EC',
-            'Tio': '#E8F5E9',
-            'Cami': '#FFE0B2',
-            'Marcos': '#EDE7F6',
-            'Joaco': '#E0F7FA'
-        };
+        // No individual player colors - use neutral colors only
+        const playerColors = null;
         
-        // Helper function to get player color
+        // Helper function to get neutral color (no individual player colors)
         function getPlayerColor(playerName) {
-            return playerColors[playerName] || '#ffffff';
+            return '#ffffff'; // Always return white/neutral
         }
         
         // Helper function to get player names array
@@ -675,30 +665,7 @@
             document.getElementById('total-matches').textContent = matches.length;
         }
 
-        // Add CSS for player badges
-        function addPlayerBadgeStyles() {
-            const style = document.createElement('style');
-            style.textContent = `
-                .player-badge {
-                    display: inline-block;
-                    width: 12px;
-                    height: 12px;
-                    border-radius: 50%;
-                    margin-right: 8px;
-                    vertical-align: middle;
-                    border: 1px solid rgba(0,0,0,0.1);
-                }
-                
-                .player-row {
-                    background-color: var(--player-color) !important;
-                }
-                
-                .matrix-player-header {
-                    background-color: var(--player-color) !important;
-                }
-            `;
-            document.head.appendChild(style);
-        }
+        // Removed player badge styles - no individual player colors
 
         // Calculate player statistics
         function calculatePlayerStats(playerName) {
@@ -738,7 +705,6 @@
             
             const playerStats = players.map(playerName => ({
                 name: playerName,
-                color: getPlayerColor(playerName),
                 ...calculatePlayerStats(playerName)
             }));
             
@@ -768,10 +734,8 @@
                 } else if (position >= 8) {
                     row.style.backgroundColor = '#F8D7DA';
                     row.style.color = '#721c24';
-                } else {
-                    // Keep default alternating colors for positions 4-7
-                    row.style.backgroundColor = player.color;
                 }
+                // No individual player colors - positions 4-7 keep default table styling
                 
                 row.innerHTML = `
                     <td style="text-align: center;"><strong>${position}</strong></td>
@@ -834,7 +798,7 @@
                 const row = document.createElement('tr');
                 const headerCell = document.createElement('th');
                 headerCell.textContent = rowPlayer;
-                headerCell.style.backgroundColor = getPlayerColor(rowPlayer);
+                // No individual player colors for matrix headers
                 row.appendChild(headerCell);
                 
                 players.forEach(colPlayer => {
@@ -907,15 +871,14 @@
                 const date = match.timestamp.toLocaleDateString('es-ES');
                 const time = match.timestamp.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
                 
-                const player1Badge = `<span class="player-badge" style="background-color: ${getPlayerColor(match.player1)}"></span>`;
-                const player2Badge = `<span class="player-badge" style="background-color: ${getPlayerColor(match.player2)}"></span>`;
+                // No player badges - clean display without individual colors
                 
                 row.innerHTML = `
                     <td>${matches.length - index}</td>
                     <td>${date}<br><small>${time}</small></td>
-                    <td>${player1Badge}<strong>${match.player1}</strong></td>
+                    <td><strong>${match.player1}</strong></td>
                     <td><strong>${match.player1Goals} - ${match.player2Goals}</strong></td>
-                    <td>${player2Badge}<strong>${match.player2}</strong></td>
+                    <td><strong>${match.player2}</strong></td>
                     <td><span class="match-result ${resultClass}">${winner === 'Empate' ? 'Empate' : 'Ganó ' + winner}</span></td>
                     <td><button class="btn btn-danger btn-small" onclick="deleteMatch(${match.id})">Eliminar</button></td>
                 `;
@@ -947,7 +910,6 @@
                 
                 return {
                     name: playerName,
-                    color: getPlayerColor(playerName),
                     gold: gold,
                     silver: silver,
                     totalCount: totalCount,
@@ -979,10 +941,8 @@
                 } else if (position >= 8) {
                     row.style.backgroundColor = '#F8D7DA';
                     row.style.color = '#721c24';
-                } else {
-                    // Keep default alternating colors for positions 4-7
-                    row.style.backgroundColor = player.color;
                 }
+                // No individual player colors - positions 4-7 keep default table styling
                 
                 row.innerHTML = `
                     <td style="text-align: center;"><strong>${position}</strong></td>
@@ -1052,8 +1012,7 @@
 
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            addPlayerBadgeStyles();
-            init();
+            init(); // Removed player badge styles
         });
     </script>
 </body>
